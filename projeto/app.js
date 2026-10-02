@@ -1,7 +1,12 @@
 const express=require('express');
 const app=express();
 const mysql=require('mysql2');
+const path=require('path');
 const port=3000;
+
+app.set('view engine', 'ejs');
+
+app.use(express.static(path.join(__dirname,'public')));
 
 const connection=mysql.createConnection({
     host:'localhost',
@@ -16,16 +21,14 @@ connection.connect(err=>{
 });
 
 app.get("/",(req,res)=>{
+    res.render('inicio');
+});
+
+
+app.get("/lista",(req,res)=>{
     connection.query("SELECT * FROM FUNCIONARIOS",(err,results)=>{
       if(err) console.log('erro no SELECT');
-      res.send(`
-        <h1>Lista de Funcionários</h1>
-        <ul>
-          ${results.map(funcionario => `
-            <li>${funcionario.nome} - ${funcionario.re}</li>
-          `).join('')}
-        </ul>
-      `);
+      res.render('lista',{funcionarios:results});
     });
 });
 
